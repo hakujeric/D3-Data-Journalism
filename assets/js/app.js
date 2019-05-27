@@ -27,12 +27,58 @@ var chartGroup = svg.append("g")
 var chosenXAxis = "in_poverty";
 var chosenYAxis = "obese";
 
+function xScale(csvdata, chosenXAxis) {
+    // create scales
+    var xLinearScale = d3.scaleLinear()
+      .domain([d3.min(csvdata, d => d[chosenXAxis]) * 0.8,
+        d3.max(csvdata, d => d[chosenXAxis]) * 1.2
+      ])
+      .range([0, width]);
+  
+    return xLinearScale;
+  
+  }
+
+// function used for updating xAxis var upon click on axis label
+function renderAxes(newXScale, xAxis) {
+    var bottomAxis = d3.axisBottom(newXScale);
+  
+    xAxis.transition()
+      .duration(1000)
+      .call(bottomAxis);
+  
+    return xAxis;
+  }
+
+// function used for updating circles group with a transition to
+// new circles
+function renderCircles(circlesGroup, newXScale, chosenXaxis) {
+
+    circlesGroup.transition()
+      .duration(1000)
+      .attr("cx", d => newXScale(d[chosenXAxis]));
+  
+    return circlesGroup;
+  }
 
 // Load data from data.csv
-d3.csv("assets/data/data.csv", function(error, data) {
+d3.csv("assets/data/data.csv", function(error, csvdata) {
   // Log an error if one exists
   if (error) return console.warn(error);
   // Print the Data
-  console.log(data);
+  console.log(csvdata);
+
+  //Load data into variables
+  csvdata.forEach(function(data) {
+    data.obesity = +data.obesity;
+    data.smokes = +data.smokes;
+    data.age = +data.age;
+    data.healthcare = +data.healthcare;
+    data.state = +data.state; 
+    data.income = +data.income;    
+  });
+// xLinearScale function above csv import
+var xLinearScale = xScale(hairData, chosenXAxis);
+
 
 });
